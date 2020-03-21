@@ -3,9 +3,12 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 19, 2020 at 07:07 AM
+-- Generation Time: Mar 21, 2020 at 05:51 AM
 -- Server version: 10.4.8-MariaDB
 -- PHP Version: 7.3.11
+CREATE SCHEMA ismis;
+
+USE ismis;
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET AUTOCOMMIT = 0;
@@ -29,75 +32,67 @@ SET time_zone = "+00:00";
 --
 
 CREATE TABLE `account` (
-  `id` int(11) NOT NULL,
+  `account_id` int(11) NOT NULL,
   `fname` varchar(24) DEFAULT NULL,
   `lname` varchar(16) DEFAULT NULL,
+  `address` varchar(30) DEFAULT NULL,
   `email` varchar(30) DEFAULT NULL,
-  `type` enum('Teacher','Student','','') NOT NULL,
+  `type` enum('Student','Teacher','Admin') DEFAULT NULL,
   `password` varchar(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `admin`
+-- Table structure for table `status`
 --
 
-CREATE TABLE `admin` (
-  `admin_id` int(11) NOT NULL,
-  `email` varchar(30) NOT NULL,
-  `password` varchar(30) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
---
--- Dumping data for table `admin`
---
-
-INSERT INTO `admin` (`admin_id`, `email`, `password`) VALUES
-(1000001, 'imrianenichelle@gmail.com', 'reee');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `faculty`
---
-
-CREATE TABLE `faculty` (
-  `fac_id` int(11) NOT NULL,
-  `fac_sched_id` int(11) DEFAULT NULL,
-  `fname` varchar(24) DEFAULT NULL,
-  `lname` varchar(16) DEFAULT NULL,
-  `email` varchar(30) DEFAULT NULL,
-  `password` varchar(30) DEFAULT NULL
+CREATE TABLE `status` (
+  `status_id` int(11) NOT NULL,
+  `type` enum('Student','Teacher','Admin') DEFAULT NULL,
+  `quantity` int(30) DEFAULT NULL,
+  `max_qty` int(30) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `schedule`
+-- Table structure for table `student_schedule`
 --
 
-CREATE TABLE `schedule` (
-  `sched_id` int(11) NOT NULL,
-  `sched_fac_id` int(11) DEFAULT NULL,
-  `datetime` datetime DEFAULT NULL,
-  `course_name` varchar(11) DEFAULT NULL,
-  `course_group` int(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `student`
---
-
-CREATE TABLE `student` (
+CREATE TABLE `student_schedule` (
   `stud_id` int(11) NOT NULL,
-  `stud_sched_id` int(11) DEFAULT NULL,
-  `fname` varchar(24) DEFAULT NULL,
-  `lname` varchar(16) DEFAULT NULL,
-  `email` varchar(30) DEFAULT NULL,
-  `password` varchar(30) DEFAULT NULL
+  `sched_id` int(11) DEFAULT NULL,
+  `account_id` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subject`
+--
+
+CREATE TABLE `subject` (
+  `subj_id` int(11) NOT NULL,
+  `description` varchar(30) DEFAULT NULL,
+  `max_stud` int(30) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `teacher_schedule`
+--
+
+CREATE TABLE `teacher_schedule` (
+  `sched_id` int(11) NOT NULL,
+  `subj_id` int(11) DEFAULT NULL,
+  `date` date DEFAULT NULL,
+  `time_start` time DEFAULT NULL,
+  `time_end` time DEFAULT NULL,
+  `teacher_id` int(11) DEFAULT NULL,
+  `room` varchar(30) DEFAULT NULL,
+  `quantity` int(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
@@ -108,35 +103,35 @@ CREATE TABLE `student` (
 -- Indexes for table `account`
 --
 ALTER TABLE `account`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`account_id`);
 
 --
--- Indexes for table `admin`
+-- Indexes for table `status`
 --
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`admin_id`);
+ALTER TABLE `status`
+  ADD PRIMARY KEY (`status_id`);
 
 --
--- Indexes for table `faculty`
+-- Indexes for table `student_schedule`
 --
-ALTER TABLE `faculty`
-  ADD PRIMARY KEY (`fac_id`),
-  ADD KEY `fac_sched_id` (`fac_sched_id`);
-
---
--- Indexes for table `schedule`
---
-ALTER TABLE `schedule`
-  ADD PRIMARY KEY (`sched_id`),
-  ADD KEY `sched_fac_id` (`sched_fac_id`),
-  ADD KEY `datetime` (`datetime`);
-
---
--- Indexes for table `student`
---
-ALTER TABLE `student`
+ALTER TABLE `student_schedule`
   ADD PRIMARY KEY (`stud_id`),
-  ADD KEY `stud_sched_id` (`stud_sched_id`);
+  ADD KEY `sched_id` (`sched_id`),
+  ADD KEY `account_id` (`account_id`);
+
+--
+-- Indexes for table `subject`
+--
+ALTER TABLE `subject`
+  ADD PRIMARY KEY (`subj_id`);
+
+--
+-- Indexes for table `teacher_schedule`
+--
+ALTER TABLE `teacher_schedule`
+  ADD PRIMARY KEY (`sched_id`),
+  ADD KEY `subj_id` (`subj_id`),
+  ADD KEY `teacher_id` (`teacher_id`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -146,41 +141,49 @@ ALTER TABLE `student`
 -- AUTO_INCREMENT for table `account`
 --
 ALTER TABLE `account`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `account_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `faculty`
+-- AUTO_INCREMENT for table `status`
 --
-ALTER TABLE `faculty`
-  MODIFY `fac_id` int(11) NOT NULL AUTO_INCREMENT;
+ALTER TABLE `status`
+  MODIFY `status_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `schedule`
+-- AUTO_INCREMENT for table `student_schedule`
 --
-ALTER TABLE `schedule`
-  MODIFY `sched_id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `student`
---
-ALTER TABLE `student`
+ALTER TABLE `student_schedule`
   MODIFY `stud_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `subject`
+--
+ALTER TABLE `subject`
+  MODIFY `subj_id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `teacher_schedule`
+--
+ALTER TABLE `teacher_schedule`
+  MODIFY `sched_id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
 --
 
 --
--- Constraints for table `faculty`
+-- Constraints for table `student_schedule`
 --
-ALTER TABLE `faculty`
-  ADD CONSTRAINT `faculty_ibfk_1` FOREIGN KEY (`fac_sched_id`) REFERENCES `schedule` (`sched_id`);
+ALTER TABLE `student_schedule`
+  ADD CONSTRAINT `student_schedule_ibfk_1` FOREIGN KEY (`sched_id`) REFERENCES `teacher_schedule` (`sched_id`),
+  ADD CONSTRAINT `student_schedule_ibfk_2` FOREIGN KEY (`account_id`) REFERENCES `account` (`account_id`);
 
 --
--- Constraints for table `student`
+-- Constraints for table `teacher_schedule`
 --
-ALTER TABLE `student`
-  ADD CONSTRAINT `student_ibfk_1` FOREIGN KEY (`stud_sched_id`) REFERENCES `schedule` (`sched_id`);
+ALTER TABLE `teacher_schedule`
+  ADD CONSTRAINT `teacher_schedule_ibfk_1` FOREIGN KEY (`subj_id`) REFERENCES `subject` (`subj_id`),
+  ADD CONSTRAINT `teacher_schedule_ibfk_2` FOREIGN KEY (`teacher_id`) REFERENCES `account` (`account_id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
